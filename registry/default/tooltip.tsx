@@ -1,6 +1,8 @@
 "use client";
 
 import {
+  createContext,
+  useContext,
   useEffect,
   useState,
   type ReactNode,
@@ -11,6 +13,26 @@ import { cn } from "@/lib/utils";
 import { springs } from "@/lib/springs";
 import { fontWeights } from "@/lib/font-weight";
 import { useShape } from "@/lib/shape-context";
+
+// ---------------------------------------------------------------------------
+// Portal container context
+// ---------------------------------------------------------------------------
+
+const TooltipPortalContainerContext = createContext<HTMLElement | null>(null);
+
+function TooltipPortalContainer({
+  value,
+  children,
+}: {
+  value: HTMLElement | null;
+  children: ReactNode;
+}) {
+  return (
+    <TooltipPortalContainerContext.Provider value={value}>
+      {children}
+    </TooltipPortalContainerContext.Provider>
+  );
+}
 
 // ---------------------------------------------------------------------------
 // Types
@@ -66,6 +88,7 @@ function Tooltip({
   const open = forceOpen !== undefined ? forceOpen : internalOpen;
   const [mounted, setMounted] = useState(false);
   const shape = useShape();
+  const portalContainer = useContext(TooltipPortalContainerContext);
 
   useEffect(() => {
     if (open) setMounted(true);
@@ -84,7 +107,7 @@ function Tooltip({
           {children}
         </TooltipPrimitive.Trigger>
         {mounted && (
-          <TooltipPrimitive.Portal forceMount>
+          <TooltipPrimitive.Portal forceMount container={portalContainer ?? undefined}>
             <TooltipPrimitive.Content
               side={side}
               sideOffset={sideOffset}
@@ -117,5 +140,5 @@ function Tooltip({
   );
 }
 
-export { Tooltip };
+export { Tooltip, TooltipPortalContainer };
 export type { TooltipProps, TooltipSide };
