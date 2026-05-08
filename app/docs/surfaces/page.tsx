@@ -154,7 +154,7 @@ function LadderRow({ level }: { level: number }) {
   return (
     <div className="flex items-center gap-6 py-4">
       <div
-        className={`shrink-0 w-32 h-24 ${shape.container} ${surfaceClass(level)}`}
+        className={`shrink-0 w-24 h-24 ${shape.container} ${surfaceClass(level)}`}
         aria-hidden
       />
       <div className="flex flex-col gap-1 min-w-0">
