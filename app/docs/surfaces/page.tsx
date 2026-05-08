@@ -98,7 +98,7 @@ function Playground() {
               className="text-[13px] text-foreground"
               style={{ fontVariationSettings: fontWeights.semibold }}
             >
-              Substrate
+              Sits on
             </span>
             <span className="text-[12px] text-muted-foreground font-mono">
               surface-{substrate}
@@ -110,7 +110,7 @@ function Playground() {
             min={1}
             max={8}
             step={1}
-            aria-label="Substrate surface level"
+            aria-label="Surface this stack sits on"
           />
           <div className="flex justify-between text-[10px] text-muted-foreground/60 font-mono px-0.5">
             {LEVELS.map((l) => (
@@ -124,10 +124,10 @@ function Playground() {
               className="text-[13px] text-foreground"
               style={{ fontVariationSettings: fontWeights.semibold }}
             >
-              Layers above
+              Stacks
             </span>
             <span className="text-[12px] text-muted-foreground font-mono">
-              {layers} {layers === 1 ? "layer" : "layers"} → surface-{substrate + layers}
+              {layers} {layers === 1 ? "level" : "levels"} → surface-{substrate + layers}
             </span>
           </div>
           <Slider
@@ -136,7 +136,7 @@ function Playground() {
             min={0}
             max={maxLayers}
             step={1}
-            aria-label="Number of layers above substrate"
+            aria-label="Number of levels stacked on top"
           />
           <div className="flex justify-between text-[10px] text-muted-foreground/60 font-mono px-0.5">
             {Array.from({ length: maxLayers + 1 }, (_, i) => (
