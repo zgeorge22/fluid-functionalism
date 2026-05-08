@@ -48,17 +48,13 @@ function surfaceClass(level: number) {
 function NestedSurfaces({ substrate, layers }: { substrate: number; layers: number }) {
   const shape = useShape();
   const stack = Array.from({ length: layers + 1 }, (_, i) => substrate + i);
-  return stack.reduceRight<ReactElement | null>((child, level, idx) => {
-    const isInnermost = idx === stack.length - 1;
+  return stack.reduceRight<ReactElement | null>((child, level) => {
     return (
       <div
         key={level}
-        className={`${shape.container} ${surfaceClass(level)} ${isInnermost ? "p-5" : "p-5"} flex flex-col gap-3`}
+        className={`${shape.container} ${surfaceClass(level)} p-5`}
         style={{ transition: "background-color 220ms ease, box-shadow 220ms ease" }}
       >
-        <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-mono">
-          Surface {level}
-        </span>
         {child}
       </div>
     );
