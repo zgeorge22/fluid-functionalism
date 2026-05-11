@@ -1327,8 +1327,15 @@ const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
     const solidB = Math.round(solidHueRgb.b);
     const solidColorString = `rgb(${solidR}, ${solidG}, ${solidB})`;
     const shape = useShape();
+    const substrate = useSurface();
+    // The picker panel uses bg-card (surface-3) by default; when wrapped in
+    // ColorPickerPopover the className override pushes it higher. Either way,
+    // announce the panel's effective level so descendants (FormatDropdown,
+    // etc.) elevate above it instead of colliding at the same surface.
+    const pickerLevel = Math.max(substrate, 3);
 
     return (
+      <SurfaceProvider value={pickerLevel}>
       <div
         ref={ref}
         className={cn("flex flex-col gap-2 p-3 bg-card shadow-surface-1", shape.container, className)}
@@ -1435,6 +1442,7 @@ const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
           />
         )}
       </div>
+      </SurfaceProvider>
     );
   }
 );
