@@ -317,8 +317,13 @@ function ThemedColumn({ theme, children }: { theme: "dark" | "light"; children: 
 
 function ColorPickerDemo() {
   return (
-    <div className="dark bento-card-border border bg-background rounded-2xl p-12 flex items-center justify-center min-h-[160px]">
-      <ColorPickerPopover triggerLabel="Fill" defaultValue="#FF6B35" />
+    <div className="dark bento-card-border border bg-background rounded-2xl p-8 flex items-start justify-center min-h-[700px] pointer-events-none">
+      <ColorPickerPopover
+        triggerLabel="Fill"
+        defaultValue="#FF6B35"
+        open
+        formatOpen
+      />
     </div>
   );
 }

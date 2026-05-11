@@ -77,6 +77,11 @@ interface ColorPickerProps
   onFormatChange?: (format: ColorFormat) => void;
   swatches?: string[];
   hideEyedropper?: boolean;
+  /** Controls the format dropdown's open state. When provided, the dropdown
+   *  is fully controlled and ignores user toggles. */
+  formatOpen?: boolean;
+  /** Initial open state for the format dropdown (uncontrolled). */
+  defaultFormatOpen?: boolean;
 }
 
 interface ColorPickerPopoverProps extends ColorPickerProps {
@@ -86,6 +91,13 @@ interface ColorPickerPopoverProps extends ColorPickerProps {
   triggerShowRemove?: boolean;
   onTriggerRemove?: () => void;
   triggerClassName?: string;
+  /** Controls the popover's open state. When provided, the popover is fully
+   *  controlled and ignores trigger clicks. */
+  open?: boolean;
+  /** Initial open state for the popover (uncontrolled). */
+  defaultOpen?: boolean;
+  /** Called when the open state would change (fires even when controlled). */
+  onOpenChange?: (open: boolean) => void;
 }
 
 interface ColorSwatchProps
@@ -660,11 +672,21 @@ function FormatItem({
 function FormatDropdown({
   value,
   onChange,
+  open: openProp,
+  defaultOpen = false,
 }: {
   value: ColorFormat;
   onChange: (f: ColorFormat) => void;
+  open?: boolean;
+  defaultOpen?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(defaultOpen);
+  const isControlled = openProp !== undefined;
+  const open = isControlled ? openProp : internalOpen;
+  const setOpen: (next: boolean | ((prev: boolean) => boolean)) => void = (next) => {
+    if (isControlled) return;
+    setInternalOpen(next);
+  };
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const shape = useShape();
@@ -1182,6 +1204,8 @@ const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
       onFormatChange,
       swatches,
       hideEyedropper,
+      formatOpen,
+      defaultFormatOpen,
       className,
       ...props
     },
@@ -1331,7 +1355,12 @@ const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
         </div>
 
         <div className="grid grid-cols-2 gap-2">
-          <FormatDropdown value={currentFormat} onChange={handleFormatChange} />
+          <FormatDropdown
+            value={currentFormat}
+            onChange={handleFormatChange}
+            open={formatOpen}
+            defaultOpen={defaultFormatOpen}
+          />
           {!hideEyedropper && <EyeDropperButton onPick={handleEyedrop} />}
         </div>
 
@@ -1535,11 +1564,21 @@ const ColorPickerPopover = forwardRef<HTMLDivElement, ColorPickerPopoverProps>(
       triggerShowRemove = false,
       onTriggerRemove,
       triggerClassName,
+      open: openProp,
+      defaultOpen = false,
+      onOpenChange,
       ...pickerProps
     },
     ref
   ) => {
-    const [open, setOpen] = useState(false);
+    const isOpenControlled = openProp !== undefined;
+    const [internalOpen, setInternalOpen] = useState(defaultOpen);
+    const open = isOpenControlled ? openProp : internalOpen;
+    const setOpen: (next: boolean | ((prev: boolean) => boolean)) => void = (next) => {
+      const resolved = typeof next === "function" ? next(open) : next;
+      if (!isOpenControlled) setInternalOpen(resolved);
+      onOpenChange?.(resolved);
+    };
     const triggerRef = useRef<HTMLButtonElement>(null);
     const panelRef = useRef<HTMLDivElement>(null);
     const [panelEl, setPanelEl] = useState<HTMLDivElement | null>(null);
