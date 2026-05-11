@@ -8,6 +8,7 @@ import { useShape } from "@/registry/default/lib/shape-context";
 import { SurfaceProvider } from "@/registry/default/lib/surface-context";
 import { Dropdown } from "@/registry/default/dropdown";
 import { MenuItem } from "@/registry/default/menu-item";
+import { ColorPickerPopover } from "@/registry/default/color-picker";
 import { useIcon } from "@/registry/default/lib/icon-context";
 import { useThemeContext } from "@/registry/default/lib/theme-context";
 import { BentoCard } from "@/app/components/bento-card";
@@ -242,8 +243,8 @@ export default function SurfacesDoc() {
       <DocSection title="Relative elevation">
         <div className="flex flex-col gap-3 text-[13px] text-muted-foreground leading-relaxed">
           <p>
-            Elevated components don&apos;t pick a fixed surface level — they elevate <em>relative</em> to whatever they sit on.
-            A Dropdown opened on the page background renders at one level; the same Dropdown opened inside a Dialog renders higher.
+            Elevated components don&apos;t pick a fixed surface level — their <em>background</em> elevates relative to whatever they sit on.
+            A Dropdown opened on the page background renders with a darker bg; the same Dropdown opened inside a Dialog renders with a lighter bg.
             Without this, nesting collapses (a popover inside a popover renders the same color as its parent and disappears).
           </p>
           <p>
@@ -252,22 +253,42 @@ export default function SurfacesDoc() {
             Each elevated component computes its level as <code className="px-1 py-0.5 rounded bg-muted text-[12px]">substrate + offset</code> and re-provides the
             new substrate to its children, so further nesting walks up the ladder.
           </p>
+          <p>
+            <strong className="text-foreground">Shadow stays fixed per component type.</strong> A popover always reads as a popover (same shadow weight) even when its background lifts to match a deeper context. This way a popover-inside-a-dialog doesn&apos;t suddenly look like a higher-tier component just because of where it&apos;s rendered — only its bg adapts; its shadow signature is intrinsic.
+          </p>
         </div>
         <RelativeElevationDemo />
       </DocSection>
 
+      <DocSection title="In a real component">
+        <div className="flex flex-col gap-3 text-[13px] text-muted-foreground leading-relaxed">
+          <p>
+            Open the format dropdown inside this color picker. The dropdown&apos;s background lifts above the picker panel because it nests one level deeper, but its shadow is the same shadow you&apos;d see on any dropdown.
+          </p>
+        </div>
+        <ColorPickerDemo />
+      </DocSection>
+
       <DocSection title="Used by">
         <div className="flex flex-col gap-2 text-[13px] text-muted-foreground">
-          <UsedByRow label="Tabs (selected pill)" detail="absolute surface-4" />
-          <UsedByRow label="Dropdown" detail="substrate + 2" />
-          <UsedByRow label="Select" detail="substrate + 2" />
-          <UsedByRow label="ColorPicker (popover)" detail="substrate + 2" />
-          <UsedByRow label="MobileDrawer" detail="substrate + 2" />
-          <UsedByRow label="Dialog" detail="absolute surface-5" />
+          <UsedByRow label="Tabs (selected pill)" detail="bg-surface-4 · shadow-surface-4" />
+          <UsedByRow label="Dropdown" detail="bg-surface-{substrate+2} · shadow-surface-3" />
+          <UsedByRow label="Select" detail="bg-surface-{substrate+2} · shadow-surface-3" />
+          <UsedByRow label="ColorPicker (popover)" detail="bg-surface-{substrate+2} · shadow-surface-3" />
+          <UsedByRow label="MobileDrawer" detail="bg-surface-{substrate+2} · shadow-surface-3" />
+          <UsedByRow label="Dialog" detail="bg-surface-5 · shadow-surface-5" />
           <UsedByRow label="Tooltip" detail="inverted (foreground/background)" />
         </div>
       </DocSection>
     </DocPage>
+  );
+}
+
+function ColorPickerDemo() {
+  return (
+    <div className="dark bento-card-border border bg-background rounded-2xl p-12 flex items-center justify-center min-h-[160px]">
+      <ColorPickerPopover triggerLabel="Fill" defaultValue="#FF6B35" />
+    </div>
   );
 }
 
