@@ -284,6 +284,33 @@ function CollapseDemo() {
 // Substrate context — page → popover → dialog
 // ---------------------------------------------------------------------------
 
+// Dark-mode surface hex map — used to label the demo with raw color values.
+// Kept in sync with the --surface-N tokens in app/globals.css.
+const SURFACE_HEX_DARK: Record<number, string> = {
+  1: "#171717",
+  2: "#1E1E1E",
+  3: "#252525",
+  4: "#2C2C2C",
+  5: "#333333",
+  6: "#3A3A3A",
+  7: "#414141",
+  8: "#484848",
+};
+
+function SwatchRow({ label, hex }: { label: string; hex: string }) {
+  return (
+    <div className="flex items-center gap-2 text-[11px] font-mono">
+      <span
+        aria-hidden
+        className="w-3 h-3 rounded-sm border border-border/40 shrink-0"
+        style={{ backgroundColor: hex }}
+      />
+      <span className="text-muted-foreground">{label}</span>
+      <span className="ml-auto text-foreground">{hex}</span>
+    </div>
+  );
+}
+
 function SubstrateDemo() {
   const Star = useIcon("star");
   const Clock = useIcon("clock");
@@ -304,33 +331,49 @@ function SubstrateDemo() {
   return (
     <ComponentPreview code={SUBSTRATE_CODE} padding="compact">
       <div className="dark grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
-        {scenarios.map(({ substrate, label }) => (
-          <div
-            key={substrate}
-            className="flex flex-col gap-3 rounded-2xl p-4 border border-border/40"
-            style={{ backgroundColor: `var(--surface-${substrate})` }}
-          >
-            <span
-              className="text-[12px] text-foreground"
-              style={{ fontVariationSettings: fontWeights.semibold }}
-            >
-              {label}
-            </span>
-            <SurfaceProvider value={substrate}>
-              <Dropdown className="w-full" checkedIndex={0}>
-                {items.map((item, i) => (
-                  <MenuItem
-                    key={item.label}
-                    index={i}
-                    icon={item.icon}
-                    label={item.label}
-                    checked={i === 0}
-                  />
-                ))}
-              </Dropdown>
-            </SurfaceProvider>
-          </div>
-        ))}
+        {scenarios.map(({ substrate, label }) => {
+          const menuLevel = Math.min(substrate + 2, 8);
+          return (
+            <div key={substrate} className="flex flex-col gap-3">
+              <div
+                className="flex flex-col gap-3 rounded-2xl p-4 border border-border/40"
+                style={{ backgroundColor: `var(--surface-${substrate})` }}
+              >
+                <span
+                  className="text-[12px] text-foreground"
+                  style={{ fontVariationSettings: fontWeights.semibold }}
+                >
+                  {label}
+                </span>
+                <SurfaceProvider value={substrate}>
+                  <Dropdown className="w-full" checkedIndex={0}>
+                    {items.map((item, i) => (
+                      <MenuItem
+                        key={item.label}
+                        index={i}
+                        icon={item.icon}
+                        label={item.label}
+                        checked={i === 0}
+                      />
+                    ))}
+                  </Dropdown>
+                </SurfaceProvider>
+              </div>
+              <div className="flex flex-col gap-1 px-1">
+                <SwatchRow label="BG" hex={SURFACE_HEX_DARK[substrate]} />
+                <SwatchRow label="Menu" hex={SURFACE_HEX_DARK[menuLevel]} />
+                <div className="flex items-center gap-2 text-[11px] font-mono pt-1">
+                  <span className="text-muted-foreground">Hover</span>
+                  <span className="ml-auto text-foreground">+6%</span>
+                </div>
+                <div className="flex items-center gap-2 text-[11px] font-mono">
+                  <span className="text-muted-foreground">Selected</span>
+                  <span className="ml-auto text-foreground">+10%</span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </ComponentPreview>
   );
@@ -690,14 +733,9 @@ export default function SurfacesDoc() {
           Substrate
         </h3>
         <p className="text-[13px] text-muted-foreground leading-relaxed">
-          <code className="px-1 py-0.5 rounded bg-muted text-[12px]">
-            SurfaceProvider
-          </code>{" "}
-          declares the current level;{" "}
-          <code className="px-1 py-0.5 rounded bg-muted text-[12px]">
-            useSurface()
-          </code>{" "}
-          reads it (default: 1, the page).
+          Each container knows its own level and tells whatever opens inside.
+          A popover on the page and the same popover inside a dialog both
+          end up at the right depth, without anything passed between them.
         </p>
         <SubstrateDemo />
 
@@ -708,12 +746,9 @@ export default function SurfacesDoc() {
           Elevated
         </h3>
         <p className="text-[13px] text-muted-foreground leading-relaxed">
-          ~15 lines: read substrate, add offset, apply classes, re-provide.{" "}
-          <code className="px-1 py-0.5 rounded bg-muted text-[12px]">
-            shadowLevel
-          </code>{" "}
-          lets the bg track the stack while the shadow signature stays
-          fixed per component type.
+          Wrap a panel and the background settles at the level it belongs to.
+          The shadow doesn&apos;t change, so a popover still reads as a popover
+          three layers down.
         </p>
         <ElevatedDemo />
       </DocSection>
