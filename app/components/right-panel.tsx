@@ -140,11 +140,10 @@ export function SettingsContent({ tooltipSide = "left", hideSocial }: { tooltipS
               <SelectTrigger
                 variant="borderless"
                 className="min-w-0 w-auto h-7 px-2 text-[13px]"
-                icon={PaletteIcon}
               />
               <SelectContent>
                 {iconOptions.map((o, i) => (
-                  <SelectItem key={o.value} value={o.value} index={i} icon={o.icon}>
+                  <SelectItem key={o.value} value={o.value} index={i}>
                     {o.label}
                   </SelectItem>
                 ))}
@@ -152,25 +151,22 @@ export function SettingsContent({ tooltipSide = "left", hideSocial }: { tooltipS
             </Select>
           </div>
         </Tooltip>
-        <Tooltip content="Switches the install command between Radix and Base UI flavors" side={tooltipSide}>
-          <div className="flex items-center justify-between px-2">
-            <span className="text-[13px] text-muted-foreground">Primitive</span>
-            <Select value={base} onValueChange={(v) => setBase(v as Base)}>
-              <SelectTrigger
-                variant="borderless"
-                className="min-w-0 w-auto h-7 px-2 text-[13px]"
-                icon={PrimitiveTriggerIcon}
-              />
-              <SelectContent>
-                {baseOptions.map((o, i) => (
-                  <SelectItem key={o.value} value={o.value} index={i} icon={o.icon}>
-                    {o.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </Tooltip>
+        <div className="flex items-center justify-between px-2">
+          <span className="text-[13px] text-muted-foreground">Primitive</span>
+          <Select value={base} onValueChange={(v) => setBase(v as Base)}>
+            <SelectTrigger
+              variant="borderless"
+              className="min-w-0 w-auto h-7 px-2 text-[13px]"
+            />
+            <SelectContent>
+              {baseOptions.map((o, i) => (
+                <SelectItem key={o.value} value={o.value} index={i}>
+                  {o.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Credit */}

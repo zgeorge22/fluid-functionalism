@@ -56,6 +56,10 @@ interface ButtonProps
   loading?: boolean;
   leadingIcon?: IconComponent;
   trailingIcon?: IconComponent;
+  /** Force the visual pressed/held state. Useful when the button drives an
+   *  external open piece of UI (a popover, dropdown, etc.) so it reads as
+   *  engaged while the menu is showing. */
+  active?: boolean;
 }
 
 const bgVariants: Record<string, string> = {
@@ -63,6 +67,13 @@ const bgVariants: Record<string, string> = {
   secondary: "bg-accent group-hover:bg-accent/80 group-active:bg-accent",
   tertiary: "bg-transparent group-hover:bg-hover group-active:bg-active",
   ghost: "bg-transparent group-hover:bg-hover group-active:bg-active",
+};
+
+const activeBgVariants: Record<string, string> = {
+  primary: "bg-foreground/80",
+  secondary: "bg-accent",
+  tertiary: "bg-active",
+  ghost: "bg-active",
 };
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -75,6 +86,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       loading = false,
       leadingIcon: LeadingIcon,
       trailingIcon: TrailingIcon,
+      active = false,
       disabled,
       children,
       style,
@@ -86,7 +98,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const isIconOnly = size === "icon" || size === "icon-sm" || size === "icon-lg";
     const iconSize = size === "sm" ? 14 : size === "lg" ? 20 : 16;
     const shape = useShape();
-    const bgClass = bgVariants[variant ?? "primary"];
+    const bgClass = active
+      ? activeBgVariants[variant ?? "primary"]
+      : bgVariants[variant ?? "primary"];
 
     return (
       <Comp

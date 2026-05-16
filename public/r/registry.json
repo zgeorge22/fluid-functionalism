@@ -618,10 +618,14 @@
       "name": "input-message",
       "type": "registry:ui",
       "title": "Input Message",
-      "description": "Chat-style message composer with an auto-resizing textarea, flexible left/right action slots, and a built-in send button on a Surface-2 substrate.",
-      "dependencies": [],
+      "description": "Chat-style message composer with auto-resizing textarea, drag-and-drop file attachments (PNG / JPEG / PDF), flexible left/right action slots, and a built-in send button on a Surface-2 substrate.",
+      "dependencies": [
+        "framer-motion",
+        "pdfjs-dist"
+      ],
       "registryDependencies": [
         "utils",
+        "https://www.fluidfunctionalism.com/r/springs.json",
         "https://www.fluidfunctionalism.com/r/font-weight.json",
         "https://www.fluidfunctionalism.com/r/shape-context.json",
         "https://www.fluidfunctionalism.com/r/icon-context.json",

@@ -13,7 +13,9 @@ import { shapeMap } from "@/lib/shape-context";
 const shape = shapeMap.rounded;
 
 interface MenuItemProps extends HTMLAttributes<HTMLDivElement> {
-  icon: IconComponent;
+  /** Optional leading icon. When omitted, the row renders text-only with no
+   *  reserved icon column. */
+  icon?: IconComponent;
   label: string;
   index: number;
   checked?: boolean;
@@ -66,21 +68,23 @@ const MenuItem = forwardRef<HTMLDivElement, MenuItemProps>(
         )}
         {...props}
       >
-        <span className="inline-grid">
-          <span className="col-start-1 row-start-1 invisible">
-            <Icon size={16} strokeWidth={2} />
+        {Icon && (
+          <span className="inline-grid">
+            <span className="col-start-1 row-start-1 invisible">
+              <Icon size={16} strokeWidth={2} />
+            </span>
+            <Icon
+              size={16}
+              strokeWidth={isActive || checked ? 2 : 1.5}
+              className={cn(
+                "col-start-1 row-start-1 transition-[color,stroke-width] duration-80",
+                isActive || checked
+                  ? "text-foreground"
+                  : "text-muted-foreground"
+              )}
+            />
           </span>
-          <Icon
-            size={16}
-            strokeWidth={isActive || checked ? 2 : 1.5}
-            className={cn(
-              "col-start-1 row-start-1 transition-[color,stroke-width] duration-80",
-              isActive || checked
-                ? "text-foreground"
-                : "text-muted-foreground"
-            )}
-          />
-        </span>
+        )}
         <span className="inline-grid flex-1 text-[13px]">
           <span
             className="col-start-1 row-start-1 invisible"

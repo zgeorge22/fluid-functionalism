@@ -372,14 +372,16 @@ const AskUserQuestions = forwardRef<HTMLDivElement, AskUserQuestionsProps>(
     // Mirrors the CheckboxGroup pattern: contiguous selected indices
     // collapse into a single rounded background block; stable IDs let
     // framer-motion morph block size/position when neighbours toggle.
+    // The Other row gets its own input-field-style indicator (see below) and
+    // is intentionally excluded here so it doesn't merge into a contiguous
+    // bg-accent block with adjacent selected options.
     const selectedIndices = useMemo(() => {
       const set = new Set<number>();
       options.forEach((opt, i) => {
         if (selectedIds.includes(optionKey(opt, i))) set.add(i);
       });
-      if (allowOther && otherText.length > 0) set.add(otherIndex);
       return set;
-    }, [options, selectedIds, allowOther, otherText, otherIndex]);
+    }, [options, selectedIds]);
 
     const selectedGroups = useMemo(() => {
       const runs: { start: number; end: number }[] = [];
@@ -468,6 +470,51 @@ const AskUserQuestions = forwardRef<HTMLDivElement, AskUserQuestionsProps>(
               onMouseLeave={handlers.onMouseLeave}
               className="relative flex flex-col gap-0.5 -mx-3"
             >
+              {/* Other-row input-style background (matches InputGroup's
+                  focused field: bg-card with a 1px inset ring). Shown whenever
+                  the Other input is focused or has any text. Rendered before
+                  the merged selection bg so options' bg-accent stays on top
+                  if they ever overlap (they shouldn't — Other is excluded
+                  from selectedIndices). */}
+              <AnimatePresence>
+                {(() => {
+                  if (!allowOther) return null;
+                  const otherRect = itemRects[otherIndex];
+                  const otherActive =
+                    focusedIndex === otherIndex || otherText.length > 0;
+                  if (!otherRect || !otherActive) return null;
+                  return (
+                    <motion.div
+                      key="other-input"
+                      aria-hidden
+                      className={cn(
+                        "absolute pointer-events-none bg-card ring-1 ring-inset ring-border",
+                        shape.bg
+                      )}
+                      initial={{
+                        opacity: 0,
+                        top: otherRect.top,
+                        left: otherRect.left,
+                        width: otherRect.width,
+                        height: otherRect.height,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        top: otherRect.top,
+                        left: otherRect.left,
+                        width: otherRect.width,
+                        height: otherRect.height,
+                      }}
+                      exit={{ opacity: 0, transition: { duration: 0.08 } }}
+                      transition={{
+                        ...springs.fast,
+                        opacity: { duration: 0.08 },
+                      }}
+                    />
+                  );
+                })()}
+              </AnimatePresence>
+
               {/* Selected-row backgrounds (merged for contiguous selections) */}
               <AnimatePresence>
                 {selectedGroups.map((group) => {

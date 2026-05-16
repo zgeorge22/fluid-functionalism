@@ -25,6 +25,11 @@ interface ComponentPreviewProps {
    *  is a self-contained block that already supplies its own breathing
    *  room (dialogs, full-bleed cards). Defaults to "default". */
   padding?: "default" | "compact";
+  /** Override the minimum height of the preview area. Accepts any Tailwind
+   *  min-height class (e.g. `min-h-[280px]`). Defaults to `min-h-[120px]`.
+   *  Useful when a demo opens floating UI (popovers, dropdowns) that needs
+   *  vertical room. */
+  minHeightClass?: string;
   children: ReactNode;
 }
 
@@ -34,6 +39,7 @@ export function ComponentPreview({
   onReplay,
   playbackButton,
   padding = "default",
+  minHeightClass = "min-h-[120px]",
   children,
 }: ComponentPreviewProps) {
   const [tab, setTab] = useState(0);
@@ -79,7 +85,7 @@ export function ComponentPreview({
       {/* Content */}
       {tab === 0 ? (
         <div
-          className={`flex items-center justify-center min-h-[120px] bg-background ${
+          className={`flex items-center justify-center ${minHeightClass} bg-background ${
             padding === "compact" ? "px-4 py-4" : "px-8 py-12"
           }`}
         >
@@ -87,7 +93,7 @@ export function ComponentPreview({
         </div>
       ) : (
         <div
-          className="overflow-auto text-[13px] [&_pre]:m-0 [&_pre]:p-4 [&_pre]:min-h-[120px] [&_.shiki]:!bg-transparent"
+          className={`overflow-auto text-[13px] [&_pre]:m-0 [&_pre]:p-4 ${minHeightClass.replace("min-h-", "[&_pre]:min-h-")} [&_.shiki]:!bg-transparent`}
           dangerouslySetInnerHTML={{ __html: html }}
         />
       )}
