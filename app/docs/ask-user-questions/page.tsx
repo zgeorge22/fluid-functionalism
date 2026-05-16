@@ -49,37 +49,41 @@ function ReplayableExample({
 
 // ── Code snippets ──────────────────────────────────────────────
 
-const basicCode = `import { AskUserQuestions } from "./components";
+const exampleCode = `import { AskUserQuestions } from "./components";
 
 const questions = [
   {
-    id: "section",
-    title: "Which section do you want to refine?",
+    id: "role",
+    title: "What's your role?",
     options: [
-      { id: "examples", title: "Examples", description: "The weakest section — needs proof, not just description" },
-      { id: "drift", title: "The drift", description: "Has grammar issues and the core argument" },
-      { id: "behavior", title: "Behavior gap", description: "The prototyping reframe and \\"designing in code\\"" },
-      { id: "solution", title: "The solution", description: "The three-property framework" },
+      { id: "design", title: "Designer", description: "Visual / interaction" },
+      { id: "eng", title: "Engineer", description: "Frontend / backend" },
+      { id: "pm", title: "PM", description: "Product / program" },
+      { id: "research", title: "Researcher", description: "User / market" },
+    ],
+  },
+  {
+    id: "tools",
+    title: "Which tools do you use day to day?",
+    multiSelect: true,
+    options: [
+      { id: "figma", title: "Figma", description: "Design source of truth" },
+      { id: "vscode", title: "VS Code", description: "Code editor" },
+      { id: "linear", title: "Linear", description: "Issue tracker" },
+      { id: "notion", title: "Notion", description: "Docs and planning" },
+    ],
+  },
+  {
+    id: "missing",
+    title: "What feels missing in your workflow?",
+    options: [
+      { id: "speed", title: "Speed", description: "Faster iteration loop" },
+      { id: "clarity", title: "Clarity", description: "Sharper goals" },
+      { id: "alignment", title: "Alignment", description: "Same page sooner" },
+      { id: "quality", title: "Quality", description: "Higher craft bar" },
     ],
     allowOther: true,
-  },
-  {
-    id: "depth",
-    title: "How deep should the rewrite go?",
-    options: [
-      { id: "polish", title: "Polish", description: "Tighten phrasing without changing the structure" },
-      { id: "restructure", title: "Restructure", description: "Reorder and re-frame the argument" },
-      { id: "rewrite", title: "Full rewrite", description: "Start fresh from the outline" },
-    ],
-  },
-  {
-    id: "audience",
-    title: "Who is the primary audience?",
-    options: [
-      { id: "design", title: "Designers", description: "Practitioners shaping interfaces day to day" },
-      { id: "lead", title: "Design leads", description: "People setting direction for teams" },
-      { id: "cross", title: "Cross-functional", description: "PMs and engineers reviewing the work" },
-    ],
+    otherPlaceholder: "Something else?",
   },
 ];
 
@@ -300,35 +304,39 @@ const answerProps: PropDef[] = [
 
 // ── Page ───────────────────────────────────────────────────────
 
-const basicQuestions: AskUserQuestion[] = [
+const exampleQuestions: AskUserQuestion[] = [
   {
-    id: "section",
-    title: "Which section do you want to refine?",
+    id: "role",
+    title: "What's your role?",
     options: [
-      { id: "examples", title: "Examples", description: "The weakest section — needs proof, not just description" },
-      { id: "drift", title: "The drift", description: "Has grammar issues and the core argument" },
-      { id: "behavior", title: "Behavior gap", description: 'The prototyping reframe and "designing in code"' },
-      { id: "solution", title: "The solution", description: "The three-property framework" },
+      { id: "design", title: "Designer", description: "Visual / interaction" },
+      { id: "eng", title: "Engineer", description: "Frontend / backend" },
+      { id: "pm", title: "PM", description: "Product / program" },
+      { id: "research", title: "Researcher", description: "User / market" },
+    ],
+  },
+  {
+    id: "tools",
+    title: "Which tools do you use day to day?",
+    multiSelect: true,
+    options: [
+      { id: "figma", title: "Figma", description: "Design source of truth" },
+      { id: "vscode", title: "VS Code", description: "Code editor" },
+      { id: "linear", title: "Linear", description: "Issue tracker" },
+      { id: "notion", title: "Notion", description: "Docs and planning" },
+    ],
+  },
+  {
+    id: "missing",
+    title: "What feels missing in your workflow?",
+    options: [
+      { id: "speed", title: "Speed", description: "Faster iteration loop" },
+      { id: "clarity", title: "Clarity", description: "Sharper goals" },
+      { id: "alignment", title: "Alignment", description: "Same page sooner" },
+      { id: "quality", title: "Quality", description: "Higher craft bar" },
     ],
     allowOther: true,
-  },
-  {
-    id: "depth",
-    title: "How deep should the rewrite go?",
-    options: [
-      { id: "polish", title: "Polish", description: "Tighten phrasing without changing the structure" },
-      { id: "restructure", title: "Restructure", description: "Reorder and re-frame the argument" },
-      { id: "rewrite", title: "Full rewrite", description: "Start fresh from the outline" },
-    ],
-  },
-  {
-    id: "audience",
-    title: "Who is the primary audience?",
-    options: [
-      { id: "design", title: "Designers", description: "Practitioners shaping interfaces day to day" },
-      { id: "lead", title: "Design leads", description: "People setting direction for teams" },
-      { id: "cross", title: "Cross-functional", description: "PMs and engineers reviewing the work" },
-    ],
+    otherPlaceholder: "Something else?",
   },
 ];
 
@@ -490,9 +498,9 @@ export default function AskUserQuestionsDoc() {
       slug="ask-user-questions"
       description="Stepped question flow with 2–5 options, single or multi-select, inline 'other' input, optional skip, and multi-question navigation."
     >
-      <DocSection title="Basic">
-        <ReplayableExample code={basicCode}>
-          {(k) => <AskUserQuestions key={k} questions={basicQuestions} />}
+      <DocSection title="Example">
+        <ReplayableExample code={exampleCode}>
+          {(k) => <AskUserQuestions key={k} questions={exampleQuestions} />}
         </ReplayableExample>
       </DocSection>
 
