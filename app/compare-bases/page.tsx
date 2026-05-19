@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 
 import { cn } from "@/lib/utils";
 import { useBase, type Base } from "@/lib/base-context";
+import { springs } from "@/registry/default/lib/springs";
 
 import { Button as RadixButton } from "@/registry/radix/button";
 import { Button as BaseButton } from "@/registry/base/button";
@@ -129,6 +130,7 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
 }
 
 export default function CompareBasesPage() {
+  const [heroHovered, setHeroHovered] = useState(false);
   const [switchA, setSwitchA] = useState(true);
   const [switchB, setSwitchB] = useState(true);
   const [sliderA, setSliderA] = useState(50);
@@ -147,23 +149,45 @@ export default function CompareBasesPage() {
 
   return (
     <div className="min-h-screen p-12 bg-background text-foreground">
-      <section className="flex flex-col items-center text-center py-20 mb-8">
+      <section
+        className="flex flex-col items-center text-center pt-40 pb-20 mb-8"
+        onMouseEnter={() => setHeroHovered(true)}
+        onMouseLeave={() => setHeroHovered(false)}
+      >
         <h1
-          className="text-6xl leading-[1.05] tracking-tight"
+          className="text-6xl leading-[1.1] tracking-tight text-foreground"
           style={{ fontVariationSettings: "'wght' 700" }}
         >
-          Built on Radix.
+          Fluid Functionalism
         </h1>
-        <h1
-          className="text-6xl leading-[1.05] tracking-tight text-muted-foreground mb-8"
+        <p
+          className="text-6xl leading-[1.1] tracking-tight text-muted-foreground"
           style={{ fontVariationSettings: "'wght' 700" }}
         >
-          Or Base UI.
-        </h1>
-        <p className="text-muted-foreground text-sm mb-8 max-w-md">
-          Same library. Pick your primitive.
+          built on Radix
         </p>
-        <PrimitiveToggle />
+        <motion.p
+          className="text-6xl leading-[1.1] tracking-tight text-foreground mb-8"
+          style={{ fontVariationSettings: "'wght' 700" }}
+          initial={false}
+          animate={{
+            opacity: heroHovered ? 1 : 0,
+            y: heroHovered ? 0 : 24,
+          }}
+          transition={springs.moderate}
+        >
+          or Base UI.
+        </motion.p>
+        <motion.div
+          initial={false}
+          animate={{
+            opacity: heroHovered ? 1 : 0,
+            y: heroHovered ? 0 : 24,
+          }}
+          transition={springs.moderate}
+        >
+          <PrimitiveToggle />
+        </motion.div>
       </section>
 
       <div className="grid grid-cols-[180px_1fr_1fr] gap-6 items-end pb-2">
