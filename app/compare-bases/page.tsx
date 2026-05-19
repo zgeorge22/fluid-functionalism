@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import type { ReactNode } from "react";
+import { motion } from "framer-motion";
+
+import { cn } from "@/lib/utils";
+import { useBase, type Base } from "@/lib/base-context";
 
 import { Button as RadixButton } from "@/registry/radix/button";
 import { Button as BaseButton } from "@/registry/base/button";
@@ -76,6 +80,43 @@ import {
   RadioItem as BaseRadioItem,
 } from "@/registry/base/radio-group";
 
+function PrimitiveToggle() {
+  const { base, setBase } = useBase();
+  const options: { value: Base; label: string }[] = [
+    { value: "radix", label: "Radix" },
+    { value: "base", label: "Base UI" },
+  ];
+  return (
+    <div className="relative inline-flex items-center gap-1 p-1 rounded-full bg-muted">
+      {options.map((o) => {
+        const selected = base === o.value;
+        return (
+          <button
+            key={o.value}
+            onClick={() => setBase(o.value)}
+            className={cn(
+              "relative px-5 py-2 text-[13px] rounded-full outline-none transition-colors duration-150",
+              "focus-visible:ring-1 focus-visible:ring-[#6B97FF] focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+              selected ? "text-background" : "text-muted-foreground hover:text-foreground"
+            )}
+            style={{ fontVariationSettings: "'wght' 500" }}
+            aria-pressed={selected}
+          >
+            {selected && (
+              <motion.span
+                layoutId="primitive-toggle-pill"
+                className="absolute inset-0 bg-foreground rounded-full"
+                transition={{ type: "spring", stiffness: 400, damping: 32 }}
+              />
+            )}
+            <span className="relative">{o.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function Row({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="grid grid-cols-[180px_1fr_1fr] gap-6 items-start py-8 border-t border-border">
@@ -105,15 +146,25 @@ export default function CompareBasesPage() {
   };
 
   return (
-    <div className="min-h-screen p-12 bg-background">
-      <h1 className="text-2xl mb-2" style={{ fontVariationSettings: "'wght' 700" }}>
-        /compare-bases
-      </h1>
-      <p className="text-muted-foreground text-sm mb-8 max-w-2xl">
-        Side-by-side Radix (left) vs Base UI (right) for all 9 primitive-touching
-        components. Visual parity check — interact with each, both columns should
-        feel identical.
-      </p>
+    <div className="min-h-screen p-12 bg-background text-foreground">
+      <section className="flex flex-col items-center text-center py-20 mb-8">
+        <h1
+          className="text-6xl leading-[1.05] tracking-tight"
+          style={{ fontVariationSettings: "'wght' 700" }}
+        >
+          Built on Radix.
+        </h1>
+        <h1
+          className="text-6xl leading-[1.05] tracking-tight text-muted-foreground mb-8"
+          style={{ fontVariationSettings: "'wght' 700" }}
+        >
+          Or Base UI.
+        </h1>
+        <p className="text-muted-foreground text-sm mb-8 max-w-md">
+          Same library. Pick your primitive.
+        </p>
+        <PrimitiveToggle />
+      </section>
 
       <div className="grid grid-cols-[180px_1fr_1fr] gap-6 items-end pb-2">
         <div />
