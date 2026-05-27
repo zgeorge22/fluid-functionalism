@@ -31,16 +31,20 @@ Dependencies resolve automatically. Font weight animations require the [Inter](h
 | Component | Description |
 |---|---|
 | [Accordion](https://www.fluidfunctionalism.com/docs/accordion) | Collapsible sections with animated expand/collapse and proximity hover |
+| [AskUserQuestions](https://www.fluidfunctionalism.com/docs/ask-user-questions) | Stepped question flow with single/multi-select, inline "other" input, and multi-question navigation |
 | [Badge](https://www.fluidfunctionalism.com/docs/badge) | Compact label with solid and dot variants, Tailwind color palette |
 | [Button](https://www.fluidfunctionalism.com/docs/button) | Variants, sizes, loading state, and icon support |
 | [CheckboxGroup](https://www.fluidfunctionalism.com/docs/checkbox-group) | Merged backgrounds for contiguous selections |
+| [ColorPicker](https://www.fluidfunctionalism.com/docs/color-picker) | HEX, RGB, HSL, and OKLCH formats with alpha, swatches, and eyedropper; inline or popover |
 | [Dialog](https://www.fluidfunctionalism.com/docs/dialog) | Modal with smooth enter/exit animations and overlay |
 | [Dropdown](https://www.fluidfunctionalism.com/docs/dropdown) | Menu-style dropdown with proximity hover |
 | [InputCopy](https://www.fluidfunctionalism.com/docs/input-copy) | Read-only input with copy-to-clipboard and animated feedback |
 | [InputGroup](https://www.fluidfunctionalism.com/docs/input-group) | Input fields with proximity hover and validation |
+| [InputMessage](https://www.fluidfunctionalism.com/docs/input-message) | Chat-style composer with auto-resizing textarea, action slots, and built-in send button |
 | [RadioGroup](https://www.fluidfunctionalism.com/docs/radio-group) | Radio buttons with proximity hover and animated selection |
 | [Select](https://www.fluidfunctionalism.com/docs/select) | Animated select with bordered/borderless variants |
 | [Slider](https://www.fluidfunctionalism.com/docs/slider) | Range slider with step snapping, range mode, animated thumb |
+| [Surfaces](https://www.fluidfunctionalism.com/docs/surfaces) | Eight nesting elevation levels so popovers, dropdowns, and dialogs stay visible at any depth |
 | [Switch](https://www.fluidfunctionalism.com/docs/switch) | Toggle with animated thumb and label |
 | [Table](https://www.fluidfunctionalism.com/docs/table) | Data table with row hover effects |
 | [Tabs](https://www.fluidfunctionalism.com/docs/tabs) | Segmented control with sliding indicator and proximity hover |
@@ -66,4 +70,4 @@ Dependencies resolve automatically. Font weight animations require the [Inter](h
 
 ## License
 
-MIT
+[MIT](LICENSE) © Micka Touillaud
