@@ -56,11 +56,10 @@ export default function DocsIndex() {
           </h3>
           <p>
             Every animation here points at something. When two list items
-            merge their backgrounds, the component is telling you they
-            belong together. The hover highlight slides toward your
-            cursor before you click, so the row you&apos;re about to land
-            on confirms itself first. Motion has to do that job, or it
-            doesn&apos;t ship.
+            merge their backgrounds, the component tells you they belong
+            together. The hover highlight follows your cursor before you
+            click, so the row you&apos;re about to land on confirms
+            itself first. Motion has a job to create meaning.
           </p>
         </div>
 
@@ -109,6 +108,23 @@ export default function DocsIndex() {
             library you&apos;ve already chosen. Your theme tokens
             (colors, radii, fonts) work as-is. One CLI command installs
             a component along with whatever it needs.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <h3
+            className="text-[16px] text-foreground leading-none"
+            style={{ fontVariationSettings: fontWeights.semibold }}
+          >
+            Customize using the right panel
+          </h3>
+          <p>
+            The panel on the right lets you change things on the fly.
+            Switch between light and dark mode, toggle the corner radius
+            from rounded to pill, cycle through different icon libraries,
+            or pick whether the install command grabs the Radix flavor or
+            the Base UI one. Press T, R, or I to flip the first three
+            from the keyboard.
           </p>
         </div>
       </section>
