@@ -82,8 +82,8 @@
      Decoupled from --foreground so a forced-theme scope (e.g. .dark inside a
      light page) gets the correct overlay even when text color is reassigned. */
   --overlay: 0 0 0;
-  --hover: rgb(var(--overlay) / 0.06);
-  --active: rgb(var(--overlay) / 0.1);
+  --hover: rgb(var(--overlay) / 0.04);
+  --active: rgb(var(--overlay) / 0.07);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -196,8 +196,8 @@
   --checker-b: #ffffff;
 
   --overlay: 0 0 0;
-  --hover: rgb(var(--overlay) / 0.06);
-  --active: rgb(var(--overlay) / 0.1);
+  --hover: rgb(var(--overlay) / 0.04);
+  --active: rgb(var(--overlay) / 0.07);
 }
 
 .dark {
