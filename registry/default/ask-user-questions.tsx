@@ -576,8 +576,16 @@ const AskUserQuestions = forwardRef<HTMLDivElement, AskUserQuestionsProps>(
     // ── Layout calculations for hover/focus indicators ───────────
     const activeRect =
       activeIndex !== null ? itemRects[activeIndex] : null;
+    // The blue morphing focus ring is intentionally suppressed for the Other
+    // field: that row has its own input-field treatment (the "type here" hint
+    // when empty, the merged selected bg once it has text), so the ring is
+    // redundant there and reads as noise while typing. focusedIndex is still
+    // tracked for the hint and submit-arrow visibility — we just don't draw a
+    // ring around it.
     const focusRect =
-      focusedIndex !== null ? itemRects[focusedIndex] : null;
+      focusedIndex !== null && !(allowOther && focusedIndex === otherIndex)
+        ? itemRects[focusedIndex]
+        : null;
 
     // ── Selected-row grouping (merges contiguous selections) ─────
     // Mirrors the CheckboxGroup pattern: contiguous selected indices
