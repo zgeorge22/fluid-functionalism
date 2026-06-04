@@ -13,6 +13,7 @@ Checklist and conventions for documenting every new component in this project. F
 - [ ] `forwardRef` with `displayName` set
 - [ ] CVA (`class-variance-authority`) for variant/size management if the component has visual variants
 - [ ] Named exports for the component, sub-components, variant helper, and props type
+- [ ] Any text that changes weight on state (selected/checked/active/open) uses the **ghost-span pattern** (see below) — never animate weight on text without reserving its width
 - [ ] Uses `@/` path aliases for all internal imports:
   ```ts
   import { cn } from "@/lib/utils";
@@ -112,6 +113,48 @@ export default function ComponentNameDoc() {
   );
 }
 ```
+
+---
+
+## Animated Font Weight — the Ghost-Span Pattern
+
+When text gets heavier on an interactive state (selected, checked, active, open, interacting), **every** instance in this project uses the same structure. A heavier weight is wider, so animating weight on a bare text node causes the layout to reflow as the user interacts. To prevent this, render an invisible "ghost" copy of the label at the **heaviest** weight to reserve the width, and overlay the visible (animating) copy in the same grid cell.
+
+**Required structure — copy verbatim:**
+
+```tsx
+<span className="inline-grid">
+  {/* Ghost: reserves width at the heaviest weight, hidden from AT */}
+  <span
+    className="col-start-1 row-start-1 invisible"
+    style={{ fontVariationSettings: fontWeights.semibold }}
+    aria-hidden="true"
+  >
+    {label}
+  </span>
+  {/* Visible: animates between weights in the same cell */}
+  <span
+    className="col-start-1 row-start-1 transition-[color,font-variation-settings] duration-80"
+    style={{
+      fontVariationSettings: isSelected
+        ? fontWeights.semibold
+        : fontWeights.normal,
+    }}
+  >
+    {label}
+  </span>
+</span>
+```
+
+**Rules:**
+- Weight comes from `fontVariationSettings` + the `fontWeights` tokens (`@/lib/font-weight`), **never** `font-weight` / `fontWeight` — the design uses Inter's variable `wght` axis.
+- Each `fontWeights` token also pairs in an optical-size (`opsz`) value (e.g. `"'wght' 550, 'opsz' 20"`). This is intentional, **not** a stray axis: a heavier `wght` widens the text and a tighter (higher) `opsz` pulls it back, so animating between weights keeps the advance width nearly constant — the closed→bold delta drops from ~3px to ~0.6px (≈±0.5%), centered on zero. A sub-pixel residual remains because a single opsz value can't zero every string (glyph mixes scale differently); the ghost span still pins the container, so nothing reflows regardless. `font-variation-settings` interpolates `opsz` alongside `wght` during the transition. The explicit `opsz` overrides `font-optical-sizing: auto` on purpose — weight, not font-size, drives optical size here. Always read these from the tokens; never hand-write a bare `'wght' N` string.
+- The ghost span is always set to the **heaviest** weight the visible span can reach, carries `invisible` + `aria-hidden="true"`, and renders the identical content.
+- Both spans share the cell via `col-start-1 row-start-1` inside an `inline-grid` (or `grid`/`inline-grid flex-1` when it must fill a row).
+- The transition **must** include `font-variation-settings` in its property list (e.g. `transition-[color,font-variation-settings] duration-80`). Plain `transition-colors` / `transition-opacity` will *not* animate weight — it snaps. Use `duration-80` (the slider's value readout is the one intentional exception at `duration-100`).
+- Skip the ghost span only when the weight is **static** for the lifetime of the node (e.g. table header vs body rows never change) or the element is already a **fixed-size box** (e.g. a `w-5 h-5` chip holding a single digit) — there is nothing to reflow.
+
+Reference implementations: `menu-item.tsx`, `nav-item.tsx`, `tabs-subtle.tsx`, `accordion.tsx`, `checkbox-group.tsx`, `radio-group.tsx`, `color-picker.tsx`, `ask-user-questions.tsx`.
 
 ---
 

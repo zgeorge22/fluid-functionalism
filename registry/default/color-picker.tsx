@@ -656,15 +656,32 @@ function FormatItem({
         }
       }}
       className={cn(
-        `relative z-10 flex items-center px-3 py-2 text-[13px] cursor-pointer outline-none transition-colors duration-80`,
-        shape.item,
-        isActive || checked ? "text-foreground" : "text-muted-foreground"
+        `relative z-10 flex items-center px-3 py-2 text-[13px] cursor-pointer outline-none`,
+        shape.item
       )}
-      style={{
-        fontVariationSettings: checked ? fontWeights.semibold : fontWeights.normal,
-      }}
     >
-      {label}
+      <span className="inline-grid">
+        <span
+          className="col-start-1 row-start-1 invisible"
+          style={{ fontVariationSettings: fontWeights.semibold }}
+          aria-hidden="true"
+        >
+          {label}
+        </span>
+        <span
+          className={cn(
+            "col-start-1 row-start-1 transition-[color,font-variation-settings] duration-80",
+            isActive || checked ? "text-foreground" : "text-muted-foreground"
+          )}
+          style={{
+            fontVariationSettings: checked
+              ? fontWeights.semibold
+              : fontWeights.normal,
+          }}
+        >
+          {label}
+        </span>
+      </span>
     </div>
   );
 }

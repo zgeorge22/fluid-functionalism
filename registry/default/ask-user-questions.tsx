@@ -901,15 +901,24 @@ const AskUserQuestions = forwardRef<HTMLDivElement, AskUserQuestionsProps>(
                   >
                     {question.layout === "stacked" ? (
                       <>
-                        <span
-                          className="text-foreground transition-colors duration-80"
-                          style={{
-                            fontVariationSettings: isSelected
-                              ? fontWeights.semibold
-                              : fontWeights.medium,
-                          }}
-                        >
-                          {opt.title}
+                        <span className="inline-grid">
+                          <span
+                            className="col-start-1 row-start-1 invisible"
+                            style={{ fontVariationSettings: fontWeights.semibold }}
+                            aria-hidden="true"
+                          >
+                            {opt.title}
+                          </span>
+                          <span
+                            className="col-start-1 row-start-1 text-foreground transition-[color,font-variation-settings] duration-80"
+                            style={{
+                              fontVariationSettings: isSelected
+                                ? fontWeights.semibold
+                                : fontWeights.medium,
+                            }}
+                          >
+                            {opt.title}
+                          </span>
                         </span>
                         {opt.description && (
                           <span className="text-[12px] text-muted-foreground leading-snug">
@@ -919,15 +928,24 @@ const AskUserQuestions = forwardRef<HTMLDivElement, AskUserQuestionsProps>(
                       </>
                     ) : (
                       <span>
-                        <span
-                          className="text-foreground transition-colors duration-80"
-                          style={{
-                            fontVariationSettings: isSelected
-                              ? fontWeights.semibold
-                              : fontWeights.medium,
-                          }}
-                        >
-                          {opt.title}
+                        <span className="inline-grid">
+                          <span
+                            className="col-start-1 row-start-1 invisible"
+                            style={{ fontVariationSettings: fontWeights.semibold }}
+                            aria-hidden="true"
+                          >
+                            {opt.title}
+                          </span>
+                          <span
+                            className="col-start-1 row-start-1 text-foreground transition-[color,font-variation-settings] duration-80"
+                            style={{
+                              fontVariationSettings: isSelected
+                                ? fontWeights.semibold
+                                : fontWeights.medium,
+                            }}
+                          >
+                            {opt.title}
+                          </span>
                         </span>
                         {opt.description && (
                           <>
@@ -1331,7 +1349,7 @@ function Row({
       <span
         aria-hidden
         className={cn(
-          "absolute inline-flex items-center justify-center w-5 h-5 text-[11px] transition-opacity duration-80",
+          "absolute inline-flex items-center justify-center w-5 h-5 text-[11px] transition-[opacity,font-variation-settings] duration-80",
           isMulti && shape.bg,
           isMulti
             ? chipFilled
