@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { CornerDownRight } from "lucide-react";
 import {
   InputMessage,
   type QueuedMessage,
@@ -420,7 +421,7 @@ useEffect(() => () => timers.current.forEach(clearTimeout), []);
             transition={{ type: "spring", duration: 0.16 }}
             style={{ height: CARD_H, transformOrigin: "bottom center", zIndex: 100 - i }}
             onDoubleClick={() => { setValue(item.text); setQueue((q) => q.filter((x) => x.id !== item.id)); }}
-            className="absolute inset-x-0 bottom-0 flex items-center gap-2 rounded-3xl bg-surface-3 px-3.5 text-[14px] text-foreground/80 shadow-surface-3"
+            className="absolute bottom-0 left-7 right-0 flex items-center gap-2 rounded-[20px] bg-[color-mix(in_oklab,var(--accent),var(--background)_45%)] px-3.5 text-[14px] text-muted-foreground shadow-surface-3"
           >
             <span className="min-w-0 flex-1 truncate">{item.text}</span>
             <button onClick={() => setQueue((q) => q.filter((x) => x.id !== item.id))} aria-label="Remove queued message">
@@ -609,7 +610,9 @@ export default function InputMessageDoc() {
   const [queue, setQueue] = useState<QueuedMessage[]>([]);
   const [chatStatus, setChatStatus] = useState<"idle" | "streaming">("idle");
   const [queuedChat, setQueuedChat] = useState<
-    { from: "user" | "assistant"; text: string; thinking?: boolean }[]
+    // `id` is set on user turns that were dispatched from the queue, so the
+    // front stack card and this sent bubble share a layoutId and morph.
+    { from: "user" | "assistant"; text: string; thinking?: boolean; id?: string }[]
   >([]);
   // A single pausable stepper drives the in-flight reply (think → stream
   // word-by-word). Only one reply animates at a time, so one controller is
@@ -670,13 +673,15 @@ export default function InputMessageDoc() {
     }
   };
 
-  const respond = (text: string) => {
+  const respond = (text: string, queuedId?: string) => {
     const reply = `Replying to “${text}”. Here's a fuller answer that streams in a word at a time so you can watch the queue release the next message.`;
     // Append the user turn plus an assistant placeholder in its "thinking"
     // state, then keep status streaming through the think + stream phases.
+    // `queuedId` (set when dispatched from the queue) lets the sent bubble share
+    // a layoutId with the front stack card, so it morphs in.
     setQueuedChat((c) => [
       ...c,
-      { from: "user", text },
+      { from: "user", text, id: queuedId },
       { from: "assistant", text: "", thinking: true },
     ]);
     setChatStatus("streaming");
@@ -774,26 +779,67 @@ export default function InputMessageDoc() {
   // can't share an element with the stacking transforms. The stack stays
   // expanded while dragging even if the pointer leaves.
   const stackRef = useRef<HTMLDivElement>(null);
+  // `pointerDownId` = a pointer is held on this card (drag may not have started
+  // yet); `draggingId` = it crossed the move threshold and is actively dragging.
+  const [pointerDownId, setPointerDownId] = useState<string | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
-  const stackExpanded = stackHovered || draggingId !== null;
+  const [dragY, setDragY] = useState(0);
+  const dragStartYRef = useRef(0);
+  const queueLenRef = useRef(queue.length);
+  queueLenRef.current = queue.length;
+  const stackExpanded =
+    stackHovered || pointerDownId !== null || draggingId !== null;
+  const slotY = (i: number) => -i * (CARD_H + STACK_GAP);
 
-  const reorderByDrag = (item: QueuedMessage, pointerY: number) => {
-    const el = stackRef.current;
-    if (!el) return;
-    const fromBottom = el.getBoundingClientRect().bottom - pointerY;
-    setQueue((q) => {
-      const slot = Math.max(
-        0,
-        Math.min(q.length - 1, Math.floor(fromBottom / (CARD_H + STACK_GAP)))
+  // Drag-to-reorder. The dragged card follows the pointer (offset driven below);
+  // the rest snap to their new slots, and on release the dragged card snaps to
+  // its slot too. Window listeners mean a release anywhere ends the drag.
+  useEffect(() => {
+    if (!pointerDownId) return;
+    let started = false;
+    const onMove = (e: PointerEvent) => {
+      const el = stackRef.current;
+      if (!el) return;
+      if (!started) {
+        if (Math.abs(e.clientY - dragStartYRef.current) < 4) return;
+        started = true;
+        setDraggingId(pointerDownId);
+      }
+      const rect = el.getBoundingClientRect();
+      const fromBottom = rect.bottom - e.clientY;
+      // Reorder the array so the others make room (the dragged card itself is
+      // positioned by `dragY`, not its slot, while dragging).
+      setQueue((q) => {
+        const slot = Math.max(
+          0,
+          Math.min(q.length - 1, Math.floor(fromBottom / (CARD_H + STACK_GAP)))
+        );
+        const cur = q.findIndex((x) => x.id === pointerDownId);
+        if (cur === -1 || cur === slot) return q;
+        const moved = q[cur];
+        const next = [...q];
+        next.splice(cur, 1);
+        next.splice(slot, 0, moved);
+        return next;
+      });
+      const minY = -(queueLenRef.current - 1) * (CARD_H + STACK_GAP);
+      setDragY(
+        Math.max(minY, Math.min(0, e.clientY - rect.bottom + CARD_H / 2))
       );
-      const cur = q.findIndex((x) => x.id === item.id);
-      if (cur === -1 || cur === slot) return q;
-      const next = [...q];
-      next.splice(cur, 1);
-      next.splice(slot, 0, item);
-      return next;
-    });
-  };
+    };
+    const onUp = () => {
+      setPointerDownId(null);
+      setDraggingId(null);
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+    };
+  }, [pointerDownId]);
 
   const shape = useShape();
   const PlusIcon = useIcon("plus");
@@ -1066,6 +1112,25 @@ export default function InputMessageDoc() {
                         className="px-0 py-0"
                       />
                     </ChatMessage>
+                  ) : m.id ? (
+                    // Dispatched from the queue: morph in from the front card via
+                    // the shared layoutId (skip the normal entrance so it's a pure
+                    // morph; `layout` lets the size change animate too).
+                    <ChatMessage
+                      key={i}
+                      from={m.from}
+                      layoutId={`qm-${m.id}`}
+                      layout
+                      initial={false}
+                      transition={springs.moderate}
+                    >
+                      {/* Counter-scale the text so the box morph doesn't stretch
+                          it (framer scales the container; this keeps the glyphs at
+                          their natural size). */}
+                      <motion.span layout className="inline-block align-top">
+                        {m.text}
+                      </motion.span>
+                    </ChatMessage>
                   ) : (
                     <ChatMessage key={i} from={m.from}>
                       {m.text}
@@ -1095,15 +1160,24 @@ export default function InputMessageDoc() {
                   onMouseEnter={() => setStackHovered(true)}
                   onMouseLeave={() => setStackHovered(false)}
                 >
+                  {/* Queue affordance — sits in the left gutter, outside the
+                      cards, aligned with the front (next-to-send) message to
+                      signify these are waiting to be sent. */}
+                  <div
+                    className="pointer-events-none absolute bottom-0 left-0 flex items-center justify-center text-muted-foreground"
+                    style={{ height: CARD_H, width: 28 }}
+                  >
+                    <CornerDownRight size={16} strokeWidth={2} />
+                  </div>
                   <AnimatePresence initial={false}>
                     {queue.map((item, i) => {
                       const peek = Math.min(i, STACK_MAX_PEEK);
                       const isDragging = draggingId === item.id;
-                      // Dragged card sits at its slot (driven by animate, not a
-                      // free drag offset), so it snaps cleanly between positions.
+                      // While dragging, the card follows the pointer (dragY); the
+                      // rest sit at their slots and shift to make room.
                       const target = stackExpanded
                         ? {
-                            y: -i * (CARD_H + STACK_GAP),
+                            y: isDragging ? dragY : slotY(i),
                             scale: isDragging ? 1.03 : 1,
                             opacity: 1,
                           }
@@ -1115,28 +1189,20 @@ export default function InputMessageDoc() {
                       return (
                         <motion.div
                           key={item.id}
+                          // Shared id with the sent bubble — when this card is the
+                          // one that dispatches (the front), it morphs into the
+                          // inline message. Safe alongside the manual transforms:
+                          // every card's layout box is the same static absolute
+                          // slot, so framer's layout projection stays identity.
+                          layoutId={`qm-${item.id}`}
                           onDoubleClick={() => editQueuedMsg(item)}
-                          // Manual drag-to-reorder once fanned out (top = next to
-                          // send). The pointer only picks the target slot; the card
-                          // snaps to it via `animate` rather than free-floating.
+                          // Press to grab; the window listeners (above) drive the
+                          // follow + reorder and end the drag on release anywhere.
                           onPointerDown={(e) => {
                             if (!stackExpanded || e.button !== 0) return;
-                            e.currentTarget.setPointerCapture(e.pointerId);
-                            setDraggingId(item.id);
-                          }}
-                          onPointerMove={(e) => {
-                            if (draggingId === item.id)
-                              reorderByDrag(item, e.clientY);
-                          }}
-                          onPointerUp={(e) => {
-                            if (draggingId !== item.id) return;
-                            try {
-                              e.currentTarget.releasePointerCapture(e.pointerId);
-                            } catch {}
-                            setDraggingId(null);
-                          }}
-                          onPointerCancel={() => {
-                            if (draggingId === item.id) setDraggingId(null);
+                            dragStartYRef.current = e.clientY;
+                            setDragY(slotY(i));
+                            setPointerDownId(item.id);
                           }}
                           initial={{ opacity: 0, y: 14, scale: 0.96 }}
                           animate={target}
@@ -1145,14 +1211,19 @@ export default function InputMessageDoc() {
                             scale: 0.9,
                             transition: { duration: 0.12 },
                           }}
-                          transition={isDragging ? springs.fast : springs.moderate}
+                          transition={
+                            isDragging ? { duration: 0 } : springs.moderate
+                          }
                           style={{
                             height: CARD_H,
                             transformOrigin: "bottom center",
                             zIndex: isDragging ? 200 : 100 - i,
                             cursor: stackExpanded ? "grab" : "default",
                           }}
-                          className={`group/qm absolute inset-x-0 bottom-0 flex select-none items-center gap-2 bg-surface-3 px-3.5 text-[14px] text-foreground/80 shadow-surface-3 active:cursor-grabbing ${shape.container}`}
+                          // Same surface as a sent ChatMessage bubble, but muted
+                          // text (not sent yet). Narrower than the composer, with
+                          // a left gutter for the queue affordance icon.
+                          className={`group/qm absolute bottom-0 left-7 right-0 flex select-none items-center gap-2 bg-[color-mix(in_oklab,var(--accent),var(--background)_45%)] px-3.5 text-[14px] text-muted-foreground shadow-surface-3 active:cursor-grabbing ${shape.bg}`}
                         >
                           <span className="pointer-events-none min-w-0 flex-1 truncate">
                             {item.text ||
@@ -1194,8 +1265,8 @@ export default function InputMessageDoc() {
               history={queuedChat
                 .filter((m) => m.from === "user")
                 .map((m) => m.text)}
-              onSend={(text) => {
-                if (text) respond(text);
+              onSend={(text, _files, meta) => {
+                if (text) respond(text, meta?.queuedId);
                 setQueuedValue("");
               }}
               onStop={() => {

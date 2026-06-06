@@ -60,9 +60,16 @@ interface InputMessageProps
   value: string;
   /** Called with the new value on every textarea change. */
   onValueChange: (value: string) => void;
-  /** Fired when the user submits (Enter or send button). Receives the trimmed
-   *  value plus the currently-attached files. */
-  onSend?: (value: string, files: File[]) => void;
+  /** Fired when the user submits (Enter or the send button) and when a queued
+   *  message auto-dispatches. Receives the trimmed value, the attached files,
+   *  and — for auto-dispatched queue items — `meta.queuedId` (the originating
+   *  QueuedMessage id), so a consumer can e.g. morph the queued item into the
+   *  sent message via a shared-layout (`layoutId`) transition. */
+  onSend?: (
+    value: string,
+    files: File[],
+    meta?: { queuedId?: string }
+  ) => void;
   /** Placeholder text shown when the value is empty. */
   placeholder?: string;
   /** Content rendered in the bottom-left action area. Can be a function that
@@ -414,7 +421,7 @@ const InputMessage = forwardRef<HTMLDivElement, InputMessageProps>(
       if (prev === "streaming" && status === "idle" && queueArr.length > 0) {
         const [next, ...rest] = queueArr;
         onQueueChange?.(rest);
-        onSend?.(next.text, next.files);
+        onSend?.(next.text, next.files, { queuedId: next.id });
         setLiveMsg(
           `Message sent.${rest.length ? ` ${rest.length} still queued.` : ""}`
         );
