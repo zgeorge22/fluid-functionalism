@@ -613,8 +613,13 @@ export function QueuedChatDemo({
           onFilesChange={rich ? setComposerFiles : undefined}
           onSend={(text, files, meta) => {
             if (text) respond(text, files, meta?.queuedId);
-            setValue("");
-            setComposerFiles([]);
+            // Only clear the composer for an actual user submit. A queued
+            // dispatch (meta.queuedId) carries its own text/files and must
+            // leave any in-progress draft the user is typing untouched.
+            if (!meta?.queuedId) {
+              setValue("");
+              setComposerFiles([]);
+            }
           }}
           onStop={() => {
             clearStep();
