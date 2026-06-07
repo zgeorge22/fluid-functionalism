@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
 import {
   InputMessage,
   type QueuedMessage,
@@ -303,6 +303,26 @@ export function QueuedChatDemo({
     stackHovered || pointerDownId !== null || draggingId !== null;
   const slotY = (i: number) => -i * (CARD_H + STACK_GAP);
 
+  // ── Enqueue feedback: once the collapsed stack hits its peek cap, a new
+  // message lands out of sight with no visible change. Recoil the whole stack
+  // (a quick spring settle) on every growth so each enqueue is felt. Skip while
+  // expanded (the card is already visible) and on the first fill (0 → N), where
+  // the stack appearing is its own feedback.
+  const stackBump = useAnimationControls();
+  const prevStackCountRef = useRef(stackCount);
+  useEffect(() => {
+    const prev = prevStackCountRef.current;
+    prevStackCountRef.current = stackCount;
+    if (stackCount > prev && prev > 0 && !stackExpanded) {
+      stackBump.set({ y: -7 });
+      stackBump.start({
+        y: 0,
+        transition: { type: "spring", duration: 0.42, bounce: 0.5 },
+      });
+    }
+    // Only react to the count changing.
+  }, [stackCount]);
+
   useEffect(() => {
     if (!pointerDownId) return;
     let started = false;
@@ -461,6 +481,9 @@ export function QueuedChatDemo({
               onMouseEnter={() => setStackHovered(true)}
               onMouseLeave={() => setStackHovered(false)}
             >
+              {/* Recoils as a whole on enqueue (see stackBump) so a message
+                  landing behind the peek cap is still felt by the user. */}
+              <motion.div animate={stackBump} className="absolute inset-0">
               <Tooltip
                 content={`${stackCount} queued message${stackCount === 1 ? "" : "s"}`}
                 side="left"
@@ -595,6 +618,7 @@ export function QueuedChatDemo({
                   );
                 })}
               </AnimatePresence>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
