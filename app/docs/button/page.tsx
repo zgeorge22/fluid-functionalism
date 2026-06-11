@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { useIcon } from "@/lib/icon-context";
-import { Button } from "@/registry/radix/button";
 import { ComponentPreview } from "@/lib/docs/ComponentPreview";
 import { PropsTable, type PropDef } from "@/lib/docs/PropsTable";
 import { DocPage, DocSection } from "@/lib/docs/DocPage";
+import { useFlavorComponents } from "@/lib/docs/use-flavor";
 
 const variantsCode = `import { Button } from "./components";
 
@@ -52,6 +52,7 @@ const buttonProps: PropDef[] = [
 ];
 
 export default function ButtonDoc() {
+  const { Button } = useFlavorComponents();
   const Plus = useIcon("plus");
   const ArrowRight = useIcon("arrow-right");
   const Search = useIcon("search");

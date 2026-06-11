@@ -650,7 +650,8 @@
         "https://www.fluidfunctionalism.com/r/springs.json",
         "https://www.fluidfunctionalism.com/r/font-weight.json",
         "https://www.fluidfunctionalism.com/r/shape-context.json",
-        "https://www.fluidfunctionalism.com/r/icon-context.json"
+        "https://www.fluidfunctionalism.com/r/icon-context.json",
+        "https://www.fluidfunctionalism.com/r/tooltip.json"
       ],
       "files": [
         {
@@ -1083,6 +1084,7 @@
         "https://www.fluidfunctionalism.com/r/surface-context.json",
         "https://www.fluidfunctionalism.com/r/surface-classes.json",
         "https://www.fluidfunctionalism.com/r/slider.json",
+        "https://www.fluidfunctionalism.com/r/tooltip.json",
         "https://www.fluidfunctionalism.com/r/dropdown.json"
       ],
       "files": [
