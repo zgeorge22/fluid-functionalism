@@ -47,7 +47,9 @@ const CUSTOM_ITEMS = new Set([
   "springs",
   "use-proximity-hover",
   "use-merge-split",
+  "use-touch-primary",
   "elevated",
+  "scroll-fade",
   // themes (cssVars-only items, e.g. the elevation surface ladder)
   "surfaces",
   // primitive-touching components (have both Radix and Base flavours)
@@ -61,6 +63,7 @@ const CUSTOM_ITEMS = new Set([
   "input-copy",
   "input-group",
   "menu-item",
+  "scroll-area",
   "select",
   "table",
   "tabs-subtle",
