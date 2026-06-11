@@ -19,6 +19,7 @@ export interface SystemEntry {
 
 export const systemList: SystemEntry[] = [
   { slug: "surfaces", name: "Surfaces", description: "Eight-level surface and shadow ladder for elevation in light and dark mode.", isNew: true },
+  { slug: "scrolling-list", name: "Scrolling list", description: "Scroll-edge cues and custom scrollbars for every scrolling surface — fade gradient, chevron, touch-native fallback.", isNew: true },
 ];
 
 export const componentList: ComponentEntry[] = [
