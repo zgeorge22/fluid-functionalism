@@ -129,6 +129,9 @@ export interface ScrollEdgeCueProps {
   /** Sticky-mode bleed in px so the band covers the scroller's padding
    *  (e.g. 4 for `p-1`, 16 for `p-4`). Defaults to 4. */
   inset?: number;
+  /** Show the directional chevron in the band. The gradient fade always
+   *  renders; set to `false` for a fade-only cue. Defaults to `true`. */
+  chevron?: boolean;
 }
 
 export function ScrollEdgeCue({
@@ -138,6 +141,7 @@ export function ScrollEdgeCue({
   surfaceLevel,
   size = 52,
   inset = 4,
+  chevron = true,
 }: ScrollEdgeCueProps) {
   const contextLevel = useSurface();
   const surface = `var(--surface-${surfaceLevel ?? contextLevel})`;
@@ -169,28 +173,30 @@ export function ScrollEdgeCue({
           background: `linear-gradient(${dir}, transparent 0%, color-mix(in srgb, ${surface} 75%, transparent) 65%, ${surface} 100%)`,
         }}
       />
-      <svg
-        width={16}
-        height={16}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="text-muted-foreground"
-        style={
-          {
-            position: "absolute",
-            ...(vertical
-              ? { left: "50%", transform: "translateX(-50%)" }
-              : { top: "50%", transform: "translateY(-50%)" }),
-            [edge]: 8,
-          } as CSSProperties
-        }
-      >
-        <path d={CHEVRON_PATHS[edge]} />
-      </svg>
+      {chevron && (
+        <svg
+          width={16}
+          height={16}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="text-muted-foreground"
+          style={
+            {
+              position: "absolute",
+              ...(vertical
+                ? { left: "50%", transform: "translateX(-50%)" }
+                : { top: "50%", transform: "translateY(-50%)" }),
+              [edge]: 8,
+            } as CSSProperties
+          }
+        >
+          <path d={CHEVRON_PATHS[edge]} />
+        </svg>
+      )}
     </div>
   );
 

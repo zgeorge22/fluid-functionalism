@@ -36,6 +36,9 @@ interface ScrollAreaProps
   scrollFade?: boolean;
   /** Cue band size in px along the scroll axis. Defaults to 52. */
   cueSize?: number;
+  /** Show the directional chevron in the cues. The gradient fade always
+   *  renders; set to `false` for fade-only cues. Defaults to `true`. */
+  chevron?: boolean;
   /** Which axes get scrollbars and edge cues. Defaults to `"vertical"`. */
   orientation?: Orientation;
 }
@@ -52,6 +55,7 @@ const ScrollArea = forwardRef<
       viewportClassName,
       scrollFade = true,
       cueSize = 52,
+      chevron = true,
       orientation = "vertical",
       ...props
     },
@@ -73,14 +77,14 @@ const ScrollArea = forwardRef<
       >
         {orientation !== "horizontal" && (
           <>
-            <ScrollEdgeCue mode="absolute" edge="top" visible={edges.top} size={cueSize} />
-            <ScrollEdgeCue mode="absolute" edge="bottom" visible={edges.bottom} size={cueSize} />
+            <ScrollEdgeCue mode="absolute" edge="top" visible={edges.top} size={cueSize} chevron={chevron} />
+            <ScrollEdgeCue mode="absolute" edge="bottom" visible={edges.bottom} size={cueSize} chevron={chevron} />
           </>
         )}
         {orientation !== "vertical" && (
           <>
-            <ScrollEdgeCue mode="absolute" edge="left" visible={edges.left} size={cueSize} />
-            <ScrollEdgeCue mode="absolute" edge="right" visible={edges.right} size={cueSize} />
+            <ScrollEdgeCue mode="absolute" edge="left" visible={edges.left} size={cueSize} chevron={chevron} />
+            <ScrollEdgeCue mode="absolute" edge="right" visible={edges.right} size={cueSize} chevron={chevron} />
           </>
         )}
       </div>

@@ -127,7 +127,7 @@ import {
 // container. orientation="both" tracks all four edges and adds
 // both scrollbars plus the corner. w-max lets the table grow
 // past the viewport width instead of squeezing into it.
-<ScrollArea orientation="both" className="h-64 w-full max-w-md">
+<ScrollArea orientation="both" className="h-80 w-full">
   <Table className="w-max">
     <TableHeader>
       <TableRow>
@@ -162,10 +162,11 @@ const HORIZONTAL_CODE = `import { ScrollArea } from "./components";
   </div>
 </ScrollArea>`;
 
-const NO_FADE_CODE = `import { ScrollArea } from "./components";
+const NO_CHEVRON_CODE = `import { ScrollArea } from "./components";
 
-// Scrollbars only — no edge cues.
-<ScrollArea scrollFade={false} className="h-64 w-72">
+// Fade-only cues: the gradient still marks overflowing edges,
+// the directional chevron is dropped.
+<ScrollArea chevron={false} className="h-64 w-72">
   ...
 </ScrollArea>`;
 
@@ -200,6 +201,13 @@ const scrollAreaProps: PropDef[] = [
     default: "true",
     description:
       "Surface-gradient + chevron cues at edges with more content. Auto-shows on overflow; set to false to disable.",
+  },
+  {
+    name: "chevron",
+    type: "boolean",
+    default: "true",
+    description:
+      "Show the directional chevron in the cues. The gradient fade always renders; set to false for fade-only cues.",
   },
   {
     name: "cueSize",
@@ -278,6 +286,13 @@ const scrollEdgeCueProps: PropDef[] = [
     default: "4",
     description:
       "Sticky-mode bleed in px. Must match the scroller's own padding (4 for p-1, 16 for p-4) so the band — and the chevron's 8px offset — land exactly on the visible edge.",
+  },
+  {
+    name: "chevron",
+    type: "boolean",
+    default: "true",
+    description:
+      "Show the directional chevron in the band. The gradient fade always renders; set to false for a fade-only cue.",
   },
 ];
 
@@ -373,10 +388,10 @@ function WrapperDemo() {
 function TableDemo() {
   const shape = useShape();
   return (
-    <ComponentPreview code={TABLE_CODE}>
+    <ComponentPreview code={TABLE_CODE} padding="compact">
       <ScrollArea
         orientation="both"
-        className={`h-64 w-full max-w-md border border-border ${shape.container}`}
+        className={`h-80 w-full border border-border ${shape.container}`}
       >
         <Table className="w-max">
           <TableHeader>
@@ -435,12 +450,12 @@ function HorizontalDemo() {
   );
 }
 
-function NoFadeDemo() {
+function NoChevronDemo() {
   const shape = useShape();
   return (
-    <ComponentPreview code={NO_FADE_CODE}>
+    <ComponentPreview code={NO_CHEVRON_CODE}>
       <ScrollArea
-        scrollFade={false}
+        chevron={false}
         className={`h-64 w-72 border border-border ${shape.container}`}
       >
         <ReleaseRows />
@@ -591,14 +606,15 @@ export default function ScrollingListDoc() {
         </P>
         <TableDemo />
 
-        <H3>Without fade</H3>
+        <H3>Without chevron</H3>
         <P>
           <code className="px-1 py-0.5 rounded bg-muted text-[12px]">
-            scrollFade={"{false}"}
+            chevron={"{false}"}
           </code>{" "}
-          keeps the scrollbars but drops the edge cues.
+          drops the directional chevron for quieter surfaces — the gradient
+          fade always stays, so overflowing edges still read as unfinished.
         </P>
-        <NoFadeDemo />
+        <NoChevronDemo />
 
         <H3>Select</H3>
         <P>
