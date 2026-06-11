@@ -1,11 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useIcon } from "@/lib/icon-context";
 import { fontWeights } from "@/registry/default/lib/font-weight";
 import { useShape } from "@/registry/default/lib/shape-context";
-import { useScrollEdges, ScrollEdgeCue } from "@/lib/scroll-fade";
 import { ScrollArea } from "@/registry/radix/scroll-area";
 import {
   Table,
@@ -87,35 +86,17 @@ const PROBLEM_CODE = `// ❌ Native overflow — the list just stops. Nothing sa
   {releases.map((r) => <Row key={r} label={r} />)}
 </ScrollArea>`;
 
-const HOOK_CODE = `import { useScrollEdges, ScrollEdgeCue } from "@/lib/scroll-fade";
+const SIZES_CODE = `import { ScrollArea } from "./components";
 
-// Track which edges have more content. Pass the scroller's ref;
-// scroll position, resizes, and content changes are all observed.
-const edges = useScrollEdges(scrollerRef, { axis: "vertical" });
+// Two cue band sizes: "tight" (32px) for dense surfaces,
+// "comfortable" (60px, default) everywhere else. The chevron
+// stays 16px in both.
+<ScrollArea cueSize="tight" className="h-56 w-64">
+  ...
+</ScrollArea>
 
-// Inside the scroller: sticky mode adds zero layout height.
-// The gradient reads useSurface() from context, so it matches
-// the actual background at any elevation. \`inset\` matches the
-// scroller's own padding (p-3 = 12) so the band reaches the
-// visible edge.
-<div ref={scrollerRef} className="h-56 overflow-y-auto p-3 ...">
-  <ScrollEdgeCue edge="top" visible={edges.top} inset={12} />
-  {children}
-  <ScrollEdgeCue edge="bottom" visible={edges.bottom} inset={12} />
-</div>`;
-
-const SCROLL_AREA_CODE = `import { ScrollArea } from "./components";
-
-// Cues + restyled scrollbars + native fallback on touch, in one
-// wrapper. Vertical by default.
-<ScrollArea className="h-64 w-72">
-  <div className="flex flex-col p-3">
-    {releases.map((release) => (
-      <div key={release} className="px-3 py-2 text-[13px]">
-        {release}
-      </div>
-    ))}
-  </div>
+<ScrollArea cueSize="comfortable" className="h-56 w-64">
+  ...
 </ScrollArea>`;
 
 const TABLE_CODE = `import { ScrollArea } from "./components";
@@ -154,9 +135,7 @@ import {
 
 const HORIZONTAL_CODE = `import { ScrollArea } from "./components";
 
-// cueSize="tight" narrows the fade band to 32px (default
-// "comfortable" is 60px); the chevron stays 16px.
-<ScrollArea orientation="horizontal" cueSize="tight" className="w-full">
+<ScrollArea orientation="horizontal" className="w-full">
   <div className="flex gap-2 p-3 w-max">
     {months.map((month) => (
       <Card key={month} label={month} />
@@ -304,9 +283,9 @@ const scrollEdgeCueProps: PropDef[] = [
 // Demos
 // ---------------------------------------------------------------------------
 
-function ReleaseRows({ padded = true }: { padded?: boolean }) {
+function ReleaseRows() {
   return (
-    <div className={`flex flex-col ${padded ? "p-3" : ""}`}>
+    <div className="flex flex-col p-3">
       {RELEASES.map((release) => (
         <div
           key={release}
@@ -353,38 +332,30 @@ function ProblemDemo() {
   );
 }
 
-// Edge primitives, raw: a plain overflow div owning its own scroller, with
-// the hook + sticky cues wired by hand — exactly what Select does internally.
-// The padding lives on the scroller itself and `inset` matches it (p-3 = 12),
-// so the cue band reaches the visible edge and the chevron lands at the same
-// 8px offset as the absolute-mode cues in ScrollArea.
-function RawEdgesDemo() {
+function SizesDemo() {
   const shape = useShape();
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const edges = useScrollEdges(scrollerRef);
   return (
-    <ComponentPreview code={HOOK_CODE}>
-      <div
-        ref={scrollerRef}
-        className={`h-56 w-72 overflow-y-auto p-3 border border-border ${shape.container}`}
-      >
-        <ScrollEdgeCue edge="top" visible={edges.top} inset={12} />
-        <ReleaseRows padded={false} />
-        <ScrollEdgeCue edge="bottom" visible={edges.bottom} inset={12} />
+    <ComponentPreview code={SIZES_CODE} padding="responsive">
+      <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
+        <div className="flex flex-col gap-2">
+          <ScrollArea
+            cueSize="tight"
+            className={`h-56 w-64 border border-border ${shape.container}`}
+          >
+            <ReleaseRows />
+          </ScrollArea>
+          <PanelLabel>Tight — 32px band</PanelLabel>
+        </div>
+        <div className="flex flex-col gap-2">
+          <ScrollArea
+            cueSize="comfortable"
+            className={`h-56 w-64 border border-border ${shape.container}`}
+          >
+            <ReleaseRows />
+          </ScrollArea>
+          <PanelLabel>Comfortable — 60px band (default)</PanelLabel>
+        </div>
       </div>
-    </ComponentPreview>
-  );
-}
-
-function WrapperDemo() {
-  const shape = useShape();
-  return (
-    <ComponentPreview code={SCROLL_AREA_CODE}>
-      <ScrollArea
-        className={`h-64 w-72 border border-border ${shape.container}`}
-      >
-        <ReleaseRows />
-      </ScrollArea>
     </ComponentPreview>
   );
 }
@@ -437,7 +408,6 @@ function HorizontalDemo() {
     <ComponentPreview code={HORIZONTAL_CODE}>
       <ScrollArea
         orientation="horizontal"
-        cueSize="tight"
         className={`w-full max-w-md border border-border ${shape.container}`}
       >
         <div className="flex gap-2 p-3 w-max">
@@ -568,7 +538,6 @@ export default function ScrollingListDoc() {
           — a menu elevated two levels above a dialog fades into the menu
           colour, not the page colour.
         </P>
-        <RawEdgesDemo />
 
         <H3>ScrollArea</H3>
         <P>
@@ -592,19 +561,27 @@ export default function ScrollingListDoc() {
           </a>
           .
         </P>
-        <WrapperDemo />
       </DocSection>
 
       <DocSection title="Examples">
         <H3>Horizontal</H3>
-        <P>
-          Left/right chevrons, same gradient logic per edge — here with the{" "}
-          <code className="px-1 py-0.5 rounded bg-muted text-[12px]">
-            cueSize=&quot;tight&quot;
-          </code>{" "}
-          band (32px instead of the comfortable 60px).
-        </P>
+        <P>Left/right chevrons, same gradient logic per edge.</P>
         <HorizontalDemo />
+
+        <H3>Cue size</H3>
+        <P>
+          Two band sizes:{" "}
+          <code className="px-1 py-0.5 rounded bg-muted text-[12px]">
+            tight
+          </code>{" "}
+          (32px) for dense surfaces and{" "}
+          <code className="px-1 py-0.5 rounded bg-muted text-[12px]">
+            comfortable
+          </code>{" "}
+          (60px, the default) everywhere else. The chevron stays 16px in both
+          — only the gradient runway changes.
+        </P>
+        <SizesDemo />
 
         <H3>Double overflow</H3>
         <P>
